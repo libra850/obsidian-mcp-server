@@ -1,5 +1,7 @@
 # Obsidian MCP Server
 
+[English](README.en.md) | 日本語
+
 ObsidianとModel Context Protocol (MCP)を連携させるサーバーです。
 
 ## 機能
@@ -120,6 +122,54 @@ ObsidianとModel Context Protocol (MCP)を連携させるサーバーです。
 - **環境変数**:
   - `OBSIDIAN_VAULT_PATH`: Obsidianボルトのパス
   - `OBSIDIAN_TEMPLATE_DIR`: テンプレートディレクトリ名
+
+## 利用可能なツール
+
+### 1. create_note_from_template
+テンプレートを使用してObsidianノートを作成します。
+
+**パラメータ:**
+- `templateName` (必須): TEMPLATEフォルダ内のテンプレート名（.md拡張子なし）
+- `variables` (必須): テンプレート内の変数を置換するためのオブジェクト
+- `outputPath` (必須): ノートの保存先パス（vault相対パス）
+- `overwrite` (オプション): 既存ファイルを上書きするかどうか（デフォルト: false）
+
+### 2. list_templates
+TEMPLATEフォルダ内の利用可能なテンプレート一覧を取得します。
+
+**パラメータ:** なし
+
+### 3. read_note
+Obsidianノートの内容を読み込みます。
+
+**パラメータ:**
+- `notePath` (必須): ノートのパス（vault相対パス）
+
+### 4. update_note
+Obsidianノートの内容を更新します。
+
+**パラメータ:**
+- `notePath` (必須): ノートのパス（vault相対パス）
+- `content` (必須): 新しいノートの内容
+
+### 5. list_tags
+Obsidianボルト内のすべてのタグを一覧表示します。
+
+**パラメータ:** なし
+
+### 6. rename_tag
+Obsidianボルト内のタグを一括でリネームします。
+
+**パラメータ:**
+- `oldTag` (必須): 変更前のタグ名（#付きまたは#なし）
+- `newTag` (必須): 変更後のタグ名（#付きまたは#なし）
+
+### 7. search_files
+Obsidianボルト内のファイルとディレクトリを検索します。
+
+**パラメータ:**
+- `searchPath` (オプション): 検索を開始するパス（vault相対パス、省略時はルート）
+- `pattern` (オプション): 検索パターン（ファイル名の一部、省略時は全て）
 
 ## 使用方法
 
