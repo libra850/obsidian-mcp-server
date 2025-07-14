@@ -106,6 +106,51 @@ class ObsidianMCPServer {
             required: ['notePath', 'content'],
           },
         },
+        {
+          name: 'list_tags',
+          description: 'Obsidianボルト内のすべてのタグを一覧表示します',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+          },
+        },
+        {
+          name: 'rename_tag',
+          description: 'Obsidianボルト内のタグを一括でリネームします',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              oldTag: {
+                type: 'string',
+                description: '変更前のタグ名（#付きまたは#なし）',
+              },
+              newTag: {
+                type: 'string',
+                description: '変更後のタグ名（#付きまたは#なし）',
+              },
+            },
+            required: ['oldTag', 'newTag'],
+          },
+        },
+        {
+          name: 'search_files',
+          description: 'Obsidianボルト内のファイルとディレクトリを検索します',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              searchPath: {
+                type: 'string',
+                description: '検索を開始するパス（vault相対パス、省略時はルート）',
+                default: '',
+              },
+              pattern: {
+                type: 'string',
+                description: '検索パターン（ファイル名の一部、省略時は全て）',
+                default: '',
+              },
+            },
+          },
+        },
       ],
     }));
 
@@ -153,6 +198,40 @@ class ObsidianMCPServer {
             );
             return {
               content: [{ type: 'text', text: updateResult }],
+            };
+
+          case 'list_tags':
+            const tags = await this.obsidianHandler.getAllTags();
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(tags, null, 2),
+                },
+              ],
+            };
+
+          case 'rename_tag':
+            const renameResult = await this.obsidianHandler.renameTag(
+              args.oldTag as string,
+              args.newTag as string
+            );
+            return {
+              content: [{ type: 'text', text: renameResult }],
+            };
+
+          case 'search_files':
+            const searchResults = await this.obsidianHandler.searchFiles(
+              (args.searchPath as string) || '',
+              (args.pattern as string) || ''
+            );
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(searchResults, null, 2),
+                },
+              ],
             };
 
           default:
