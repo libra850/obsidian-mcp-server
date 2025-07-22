@@ -6,11 +6,18 @@ A server that integrates Obsidian with the Model Context Protocol (MCP).
 
 ## Features
 
+### Basic Features
 - Create notes using templates
 - Read and update notes
 - List available templates
-- Tag management
-- File search functionality
+- Tag management and search
+- File and directory search
+
+### Link Management Features (High Priority)
+- Create wiki links between notes
+- Detect and repair broken links
+- Backlink analysis and graph structure insights
+- Automatic generation of Map of Contents (MOC)
 
 ## Setup
 
@@ -173,6 +180,112 @@ Search files and directories in the Obsidian vault.
 - `searchPath` (optional): Path to start searching (vault relative path, root if omitted)
 - `pattern` (optional): Search pattern (part of filename, all if omitted)
 
+## Link Management Tools (High Priority Features)
+
+### 8. link_notes
+Create wiki links between notes.
+
+**Parameters:**
+- `sourceNote` (required): Source note path (vault relative path)
+- `targetNote` (required): Target note path (vault relative path)
+- `linkText` (optional): Display text (defaults to filename if omitted)
+- `insertPosition` (optional): Insert position ('end', 'cursor', or line number, default: 'end')
+
+**Features:**
+- File existence check
+- Duplicate link detection and warning
+- Relative path resolution
+- Insert in wiki link format `[[target|display text]]`
+
+### 9. find_broken_links
+Detect broken links and provide repair assistance.
+
+**Parameters:** None
+
+**Features:**
+- Support for both wiki links `[[]]` and Markdown links `[]()`
+- Fuzzy search for repair suggestions
+- Consideration of case, spaces, and special character differences
+- Display line numbers and surrounding context
+
+**Return value:**
+```json
+{
+  "brokenLinks": [
+    {
+      "sourceFile": "notes/example.md",
+      "linkText": "Missing Note",
+      "targetPath": "missing-note",
+      "lineNumber": 15,
+      "suggestions": ["similar-note", "missing-note-backup"]
+    }
+  ],
+  "totalCount": 1
+}
+```
+
+### 10. analyze_backlinks
+Perform backlink analysis and graph structure insights.
+
+**Parameters:**
+- `targetNote` (required): Target note path for analysis (vault relative path)
+
+**Features:**
+- Detect backlinks to specified note
+- Extract context around links
+- Identify related notes
+- Calculate popularity and centrality metrics
+
+**Return value:**
+```json
+{
+  "targetNote": "important-concept.md",
+  "backlinks": [
+    {
+      "sourceFile": "notes/research.md",
+      "context": "This concept is known as [[important-concept]]",
+      "linkType": "wiki"
+    }
+  ],
+  "relatedNotes": ["notes/research.md"],
+  "metrics": {
+    "popularity": 5,
+    "centrality": 0.1
+  }
+}
+```
+
+### 11. create_moc
+Automatically generate Map of Contents (MOC) notes.
+
+**Parameters:**
+- `title` (required): MOC title
+- `targetPath` (required): MOC save path (vault relative path)
+- `sourcePattern` (optional): Target note pattern (all if omitted)
+- `groupBy` (optional): Grouping method ('tag', 'folder', 'none', default: 'none')
+- `includeDescription` (optional): Whether to include descriptions (default: false)
+
+**Features:**
+- File selection by pattern matching
+- Grouping by tags or folders
+- Automatic description extraction from YAML frontmatter
+- Generate index in wiki link format
+
+**Generation example:**
+```markdown
+# Project-Related Notes
+
+*This Map of Contents was auto-generated - 2024-01-15*
+
+## #project
+- [[project-planning|Project Planning]] - New feature planning and design
+- [[project-timeline|Project Schedule]] - Development schedule and milestones
+
+## #development  
+- [[api-design|API Design]] - RESTful API specifications
+- [[database-schema|Database Design]] - Table structure and relationships
+```
+
 ## Usage
 
 ### Template Creation Example
@@ -200,7 +313,10 @@ description: "Template for creating meeting notes"
 
 ### Usage via MCP
 
+#### Basic Tool Usage Examples
+
 ```javascript
+// Create note from template
 await mcp.callTool('create_note_from_template', {
   templateName: 'meeting-notes',
   variables: {
@@ -211,5 +327,34 @@ await mcp.callTool('create_note_from_template', {
     action_items: ''
   },
   outputPath: 'meetings/2024-01-15-project-planning.md'
+});
+
+// Create links between notes
+await mcp.callTool('link_notes', {
+  sourceNote: 'meetings/2024-01-15-project-planning.md',
+  targetNote: 'projects/new-feature.md',
+  linkText: 'New Feature Project',
+  insertPosition: 'end'
+});
+```
+
+#### Link Management Tool Usage Examples
+
+```javascript
+// Detect broken links
+const brokenLinks = await mcp.callTool('find_broken_links');
+
+// Analyze backlinks
+const backlinks = await mcp.callTool('analyze_backlinks', {
+  targetNote: 'concepts/important-concept.md'
+});
+
+// Create Map of Contents
+await mcp.callTool('create_moc', {
+  title: 'Project-Related Notes',
+  targetPath: 'index/project-moc.md',
+  sourcePattern: 'project',
+  groupBy: 'tag',
+  includeDescription: true
 });
 ```

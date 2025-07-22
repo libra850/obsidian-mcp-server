@@ -151,6 +151,88 @@ class ObsidianMCPServer {
             },
           },
         },
+        {
+          name: 'link_notes',
+          description: 'ノート間にウィキリンクを作成します',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              sourceNote: {
+                type: 'string',
+                description: 'リンク元ノートパス（vault相対パス）',
+              },
+              targetNote: {
+                type: 'string',
+                description: 'リンク先ノートパス（vault相対パス）',
+              },
+              linkText: {
+                type: 'string',
+                description: '表示テキスト（省略時はファイル名）',
+              },
+              insertPosition: {
+                type: ['string', 'number'],
+                description: '挿入位置（end/cursor/行番号）',
+                default: 'end',
+              },
+            },
+            required: ['sourceNote', 'targetNote'],
+          },
+        },
+        {
+          name: 'find_broken_links',
+          description: '壊れたリンクの検出と修復支援を行います',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+          },
+        },
+        {
+          name: 'analyze_backlinks',
+          description: 'バックリンク分析とグラフ構造の把握を行います',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              targetNote: {
+                type: 'string',
+                description: '分析対象のノートパス（vault相対パス）',
+              },
+            },
+            required: ['targetNote'],
+          },
+        },
+        {
+          name: 'create_moc',
+          description: 'Map of Contents（目次ノート）を自動生成します',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              title: {
+                type: 'string',
+                description: 'MOCのタイトル',
+              },
+              targetPath: {
+                type: 'string',
+                description: 'MOCの保存先パス（vault相対パス）',
+              },
+              sourcePattern: {
+                type: 'string',
+                description: '対象ノートのパターン（省略時は全て）',
+              },
+              groupBy: {
+                type: 'string',
+                enum: ['tag', 'folder', 'none'],
+                description: 'グループ化方法',
+                default: 'none',
+              },
+              includeDescription: {
+                type: 'boolean',
+                description: '説明を含めるかどうか',
+                default: false,
+              },
+            },
+            required: ['title', 'targetPath'],
+          },
+        },
       ],
     }));
 
@@ -232,6 +314,53 @@ class ObsidianMCPServer {
                   text: JSON.stringify(searchResults, null, 2),
                 },
               ],
+            };
+
+          case 'link_notes':
+            const linkResult = await this.obsidianHandler.linkNotes(
+              args.sourceNote as string,
+              args.targetNote as string,
+              args.linkText as string,
+              (args.insertPosition as 'end' | 'cursor' | number) || 'end'
+            );
+            return {
+              content: [{ type: 'text', text: linkResult }],
+            };
+
+          case 'find_broken_links':
+            const brokenLinksResult = await this.obsidianHandler.findBrokenLinks();
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(brokenLinksResult, null, 2),
+                },
+              ],
+            };
+
+          case 'analyze_backlinks':
+            const backlinksResult = await this.obsidianHandler.analyzeBacklinks(
+              args.targetNote as string
+            );
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(backlinksResult, null, 2),
+                },
+              ],
+            };
+
+          case 'create_moc':
+            const mocResult = await this.obsidianHandler.createMoc(
+              args.title as string,
+              args.targetPath as string,
+              args.sourcePattern as string,
+              (args.groupBy as 'tag' | 'folder' | 'none') || 'none',
+              (args.includeDescription as boolean) || false
+            );
+            return {
+              content: [{ type: 'text', text: mocResult }],
             };
 
           default:
