@@ -1,3 +1,14 @@
+/**
+ * Obsidian MCP Server
+ * 
+ * A Model Context Protocol server for Obsidian vault management with
+ * advanced link management features including wiki links, backlink analysis,
+ * and Map of Contents generation.
+ * 
+ * @license MIT
+ * @copyright 2024 obsidian-mcp-server contributors
+ */
+
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {

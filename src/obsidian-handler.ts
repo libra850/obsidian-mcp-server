@@ -1,3 +1,13 @@
+/**
+ * Obsidian Handler
+ * 
+ * Core functionality for Obsidian vault management including template processing,
+ * note operations, tag management, file search, and advanced link management.
+ * 
+ * @license MIT
+ * @copyright 2024 obsidian-mcp-server contributors
+ */
+
 import { promises as fs } from 'fs';
 import path from 'path';
 import { ObsidianConfig, CreateNoteOptions } from './types.js';

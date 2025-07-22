@@ -1,19 +1,43 @@
 {
   "name": "obsidian-mcp-server",
   "version": "1.0.0",
+  "description": "A Model Context Protocol server for Obsidian vault management with advanced link management features",
   "main": "dist/server.js",
   "type": "module",
+  "bin": {
+    "obsidian-mcp-server": "dist/server.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx src/server.ts",
     "watch": "nodemon --exec tsx src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run build"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "obsidian",
+    "mcp",
+    "model-context-protocol",
+    "notes",
+    "knowledge-management",
+    "wiki-links",
+    "backlinks",
+    "markdown"
+  ],
+  "author": "obsidian-mcp-server contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/obsidian-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/obsidian-mcp-server/issues"
+  },
+  "homepage": "https://github.com/your-username/obsidian-mcp-server#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.15.0"
   },
